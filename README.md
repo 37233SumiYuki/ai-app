@@ -55,3 +55,6 @@ API に依存しない構成にしたことで、
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
+
+![アプリ画面](images/スクリーンショット 2026-05-18 222821.png)
+
