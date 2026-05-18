@@ -56,5 +56,9 @@ API に依存しない構成にしたことで、
 pip install -r requirements.txt
 streamlit run app.py
 
-![アプリ画面](images/スクリーンショット 2026-05-18 222821.png)
+## 💬 アプリ画面
 
+このアプリは Streamlit を使って構築したチャットUIを採用しています。  
+ユーザーが入力したメッセージに対して、AIが自然に返答する仕組みを実装しています。
+
+![アプリ画面](/ai-app/images/screenshot.png)
