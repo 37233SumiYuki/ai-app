@@ -10,7 +10,7 @@ st.markdown("""
 /* 全体の背景（白テーマ） */
 [data-testid="stAppViewContainer"] {
     background-color: #ffffff;
-    color: #2d2d2d;
+    color: #000000;
 }
 
 /* チャット全体の幅を中央に寄せる */
