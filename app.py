@@ -1,6 +1,7 @@
 import streamlit as st
 from ai_engine import SimpleAI  
 
+# --- ページ設定 ---
 st.set_page_config(page_title="ゆうきのAIチャット", layout="centered")
 
 # --- CSS（ChatGPT風） ---
@@ -19,19 +20,13 @@ st.markdown("""
     margin: auto;
 }
 
-/* --- アニメーション定義（ふわっと出る） --- */
+/* アニメーション定義（ふわっと出る） */
 @keyframes fadeInUp {
-    0% {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
-/* --- ユーザー吹き出し --- */
+/* ユーザー吹き出し */
 [data-testid="stChatMessageUser"] {
     background-color: #e7f3ff;
     border-radius: 12px;
@@ -40,12 +35,10 @@ st.markdown("""
     border: 1px solid #c9ddf5;
     color: #2d2d2d;
     box-shadow: 0px 1px 2px rgba(0,0,0,0.08);
-
-
     animation: fadeInUp 0.25s ease-out;
 }
 
-/* --- AI吹き出し --- */
+/* AI吹き出し */
 [data-testid="stChatMessageAssistant"] {
     background-color: #ffffff;
     border-radius: 12px;
@@ -54,8 +47,6 @@ st.markdown("""
     border: 1px solid #e5e5e5;
     color: #2d2d2d;
     box-shadow: 0px 1px 2px rgba(0,0,0,0.08);
-
-    /* ふわっとアニメーション */
     animation: fadeInUp 0.25s ease-out;
 }
 
@@ -83,33 +74,42 @@ textarea {
 </style>
 """, unsafe_allow_html=True)
 
+# --- サイドバー：会話リセットボタン ---
+with st.sidebar:
+    if st.button("会話をリセット"):
+        st.session_state.chat = []
+        st.session_state.ai = SimpleAI()
+        st.rerun()
 
-
-# --- AI インスタンス ---
+# --- AIインスタンスの初期化（初回のみ） ---
 if "ai" not in st.session_state:
     st.session_state.ai = SimpleAI()
 
-# --- チャット履歴 ---
+# --- チャット履歴の初期化（初回のみ） ---
 if "chat" not in st.session_state:
     st.session_state.chat = []
 
+# --- タイトル ---
 st.title("ゆうきのAIチャット")
 
-# --- チャット表示 ---
+# --- チャット履歴の表示 ---
 for msg in st.session_state.chat:
     st.chat_message(msg["role"]).write(msg["content"])
 
-# --- 入力欄 ---
+# --- メッセージ入力欄 ---
 user_input = st.chat_input("メッセージを入力してAIと会話しましょう")
 
 if user_input:
-    # ユーザーの発言を表示
+    # ユーザーの発言を履歴に追加（即時描画せずrerunで一本化）
     st.session_state.chat.append({"role": "user", "content": user_input})
-    st.chat_message("user").write(user_input)
 
-    #ai_engineで返答生成
-    ai_reply = st.session_state.ai.respond(user_input)
+    # AI返答の生成（履歴を渡す・スピナー表示・エラーハンドリング）
+    try:
+        with st.spinner("考え中..."):
+            ai_reply = st.session_state.ai.respond(user_input, history=st.session_state.chat)
+    except Exception as e:
+        ai_reply = f"エラーが発生しました: {e}"
 
-    # AI の返答を表示
+    # AIの返答を履歴に追加して再描画
     st.session_state.chat.append({"role": "assistant", "content": ai_reply})
-    st.chat_message("assistant").write(ai_reply)
+    st.rerun()
