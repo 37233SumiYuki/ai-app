@@ -6,7 +6,7 @@ class SimpleAI:
     def __init__(self):
         self.memory = []
 
-    # history引数を追加（使わなくてもエラーにならないようにする）
+    # history引数を追加
     def respond(self, text: str, history: list = None):
         self.memory.append(text)
 
@@ -35,7 +35,7 @@ class SimpleAI:
         # なんで・なぜ
         if re.search(r"(なんで|なぜ)", text):
             return "その疑問、すごく良いね。私も気になるところだよ。"
-        # 質問（最後に判定）
+        # 質問
         if "？" in text or "?" in text:
             return "いい質問だね。それについて少し考えてみるよ。"
         # ランダム返答

@@ -4,29 +4,29 @@ from ai_engine import SimpleAI
 # --- ページ設定 ---
 st.set_page_config(page_title="ゆうきのAIチャット", layout="centered")
 
-# --- CSS（ChatGPT風） ---
+# --- CSS ---
 st.markdown("""
 <style>
 
-/* 全体の背景（白テーマ） */
+/* 背景 */
 [data-testid="stAppViewContainer"] {
     background-color: #ffffff;
     color: #000000;
 }
 
-/* チャット全体の幅を中央に寄せる */
+/* 中央に寄せる */
 .main {
     max-width: 750px;
     margin: auto;
 }
 
-/* アニメーション定義（ふわっと出る） */
+/* アニメーション */
 @keyframes fadeInUp {
     0% { opacity: 0; transform: translateY(8px); }
     100% { opacity: 1; transform: translateY(0); }
 }
 
-/* ユーザー吹き出し */
+/* 吹き出し(ユーザー) */
 [data-testid="stChatMessageUser"] {
     background-color: #e7f3ff;
     border-radius: 12px;
@@ -38,7 +38,7 @@ st.markdown("""
     animation: fadeInUp 0.25s ease-out;
 }
 
-/* AI吹き出し */
+/* 吹き出し（AI) */
 [data-testid="stChatMessageAssistant"] {
     background-color: #ffffff;
     border-radius: 12px;
@@ -74,25 +74,25 @@ textarea {
 </style>
 """, unsafe_allow_html=True)
 
-# --- サイドバー：会話リセットボタン ---
+# --- 会話リセット ---
 with st.sidebar:
     if st.button("会話をリセット"):
         st.session_state.chat = []
         st.session_state.ai = SimpleAI()
         st.rerun()
 
-# --- AIインスタンスの初期化（初回のみ） ---
+# --- AIインスタンスの初期化 ---
 if "ai" not in st.session_state:
     st.session_state.ai = SimpleAI()
 
-# --- チャット履歴の初期化（初回のみ） ---
+# --- チャット履歴の初期化 ---
 if "chat" not in st.session_state:
     st.session_state.chat = []
 
 # --- タイトル ---
 st.title("ゆうきのAIチャット")
 
-# --- チャット履歴の表示 ---
+# --- 履歴の表示 ---
 for msg in st.session_state.chat:
     st.chat_message(msg["role"]).write(msg["content"])
 
@@ -100,10 +100,10 @@ for msg in st.session_state.chat:
 user_input = st.chat_input("メッセージを入力してAIと会話しましょう")
 
 if user_input:
-    # ユーザーの発言を履歴に追加（即時描画せずrerunで一本化）
+    # ユーザーの発言を履歴に追加
     st.session_state.chat.append({"role": "user", "content": user_input})
 
-    # AI返答の生成（履歴を渡す・スピナー表示・エラーハンドリング）
+    # AI返答の生成
     try:
         with st.spinner("考え中..."):
             ai_reply = st.session_state.ai.respond(user_input, history=st.session_state.chat)
