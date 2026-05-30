@@ -1,5 +1,6 @@
 import streamlit as st
-from ai_engine import SimpleAI  
+from ai_engine import SimpleAI
+import time
 
 # --- ページ設定 ---
 st.set_page_config(page_title="ゆうきのAIチャット", layout="centered")
@@ -36,6 +37,7 @@ st.markdown("""
     color: #2d2d2d;
     box-shadow: 0px 1px 2px rgba(0,0,0,0.08);
     animation: fadeInUp 0.25s ease-out;
+    transition: box-shadow 0.2s ease;
 }
 
 /* 吹き出し（AI) */
@@ -48,6 +50,16 @@ st.markdown("""
     color: #2d2d2d;
     box-shadow: 0px 1px 2px rgba(0,0,0,0.08);
     animation: fadeInUp 0.25s ease-out;
+    transition: box-shadow 0.2s ease;
+}
+
+/* ホバーエフェクト */
+[data-testid="stChatMessageUser"]:hover {
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.12);
+}
+
+[data-testid="stChatMessageAssistant"]:hover {
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.12);
 }
 
 /* 吹き出し内のテキスト */
@@ -76,7 +88,10 @@ textarea {
 
 # --- 会話リセット ---
 with st.sidebar:
-    if st.button("会話をリセット"):
+    st.markdown("### ⚙️ 設定")
+    st.divider()
+    st.caption(f"💬 メッセージ数: {len(st.session_state.get('chat', []))}")
+    if st.button("🗑️ 会話をリセット"):
         st.session_state.chat = []
         st.session_state.ai = SimpleAI()
         st.rerun()
@@ -94,13 +109,15 @@ st.title("ゆうきのAIチャット")
 
 # --- 履歴の表示 ---
 for msg in st.session_state.chat:
-    st.chat_message(msg["role"]).write(msg["content"])
+    avatar = "🧑‍💻" if msg["role"] == "user" else "🤖"
+    st.chat_message(msg["role"], avatar=avatar).write(msg["content"])
 
 # --- メッセージ入力欄 ---
 user_input = st.chat_input("メッセージを入力してAIと会話しましょう")
 
 if user_input:
-    # ユーザーの発言を履歴に追加
+    # ユーザーの発言を表示・履歴に追加
+    st.chat_message("user", avatar="🧑‍💻").write(user_input)
     st.session_state.chat.append({"role": "user", "content": user_input})
 
     # AI返答の生成
@@ -109,6 +126,15 @@ if user_input:
             ai_reply = st.session_state.ai.respond(user_input, history=st.session_state.chat)
     except Exception as e:
         ai_reply = f"エラーが発生しました: {e}"
+
+    # ストリーミング風にAI返答を表示
+    def stream_response(text):
+        for char in text:
+            yield char
+            time.sleep(0.02)
+
+    with st.chat_message("assistant", avatar="🤖"):
+        st.write_stream(stream_response(ai_reply))
 
     # AIの返答を履歴に追加して再描画
     st.session_state.chat.append({"role": "assistant", "content": ai_reply})
