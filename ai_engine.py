@@ -38,6 +38,13 @@ class SimpleAI:
         # 質問
         if "？" in text or "?" in text:
             return "いい質問だね。それについて少し考えてみるよ。"
+        #天気
+        if re.search(r"(天気)", text):
+            return "天気はいいですね。外に出て過ごすのもいいですよ。"
+        #空腹
+        if re.search(r"(空腹|お腹空いた)", text):
+            return "お腹空いたの？何か食べたいものある？"
+        
         # ランダム返答
         responses = [
             "なるほど、面白いね。",
